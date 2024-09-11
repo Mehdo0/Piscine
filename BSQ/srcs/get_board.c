@@ -3,68 +3,107 @@
 /*                                                        :::      ::::::::   */
 /*   get_board.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmouaffa <mmouaffa@student.42.fr>          +#+  +:+       +#+        */
+/*   By: imeulema <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/09 16:34:37 by imeulema          #+#    #+#             */
-/*   Updated: 2024/09/10 11:01:21 by mmouaffa         ###   ########.fr       */
+/*   Created: 2024/09/10 15:50:52 by imeulema          #+#    #+#             */
+/*   Updated: 2024/09/10 16:49:17 by imeulema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft.h"
 
-#include <stdio.h>
-
-void	print_board(char **tab, t_map_info info)
+char	**allocate_board(t_map_info info, char **board)
 {
-	int	i;
-
-	i = 0;
-	while (i < info.x)
-	{
-		write(1, tab[i], info.y);
-		write(1, "\n", 1);
-		i++;
-	}
-}
-
-char	**get_board(t_map_info info, char *map)
-{
-	int		i;
-	int		j;
-	int		row;
-	char	**board;
+	int	row;
 
 	board = (char **) malloc((info.x + 1) * sizeof(char *));
 	if (!board)
 		return (NULL);
-	board[0] = (char *)malloc((info.y + 1) * sizeof(char));
-	if (!board[0])
-		return (NULL);
+	row = 0;
+	while (row < info.x)
+	{
+		board[row] = (char *) malloc((info.y + 1) * sizeof(char));
+		if (!board[row])
+		{
+			free_board(info, board);
+			return (NULL);
+		}
+		row++;
+	}
+	return (board);
+}
+
+char	**make_board(t_map_info info, char **board, char *map)
+{
+	int	i;
+	int	j;
+	int	row;
+
 	i = 0;
 	row = 0;
 	while (map[i] != '\n')
 		i++;
-	while (map[i])
+	i++;
+	while (row < info.x)
 	{
-		if (map[i] == info.empty || map[i] == info.obstacle)
+		j = 0;
+		while (j < info.y && map[i] != '\n')
+			board[row][j++] = map[i++];
+		if ((j < info.y && map[i] == '\n') || (j == info.y && map[i] != '\n'))
 		{
-			j = 0;
-			while (j < info.y)
-			{
-				board[row][j] = map[i];
-				j++;
-				i++;
-			}
-			board[row][j] = 0;
-			row++;
-			board[row] = (char *) malloc((info.y + 1) * sizeof(char));
-			if (!board[row])
-				return (NULL);
+			write(1, "map error\n", 10);
+			return (NULL);
 		}
-		else
-			i++;
+		board[row++][j] = 0;
+		i++;
 	}
 	board[row] = NULL;
-	print_board(board, info);
 	return (board);
+}
+
+char	**check_chars(t_map_info info, char **board)
+{
+	int	i;
+	int	j;
+
+	i = 0;
+	while (i < info.x)
+	{
+		j = 0;
+		while (board[i][j])
+		{
+			if (board[i][j] != info.empty && board[i][j] != info.obstacle)
+			{
+				write(1, "map error\n", 10);
+				return (NULL);
+			}
+			j++;
+		}
+		i++;
+	}
+	return (board);
+}
+
+char	**get_board(t_map_info info, char *map)
+{
+	char	**board;
+	char	**verif;
+
+	board = NULL;
+	board = allocate_board(info, board);
+	if (!board)
+		return (NULL);
+	verif = make_board(info, board, map);
+	if (!verif)
+	{
+		free_board(info, board);
+		return (NULL);
+	}
+	verif = check_chars(info, verif);
+	if (!verif)
+	{
+		free_board(info, board);
+		return (NULL);
+	}
+	return (verif);
 }

@@ -6,7 +6,7 @@
 /*   By: mmouaffa <mmouaffa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/09 13:34:54 by mmouaffa          #+#    #+#             */
-/*   Updated: 2024/09/10 13:10:56 by mmouaffa         ###   ########.fr       */
+/*   Updated: 2024/09/11 14:42:35 by mmouaffa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ t_sqr	*backtrack(char **board, t_map_info *info)
 
 	i = 0;
 	resultat = NULL;
-	if (max_density(board, info) == 1)
+	if (max_density(board, info) || low_density(board, info))
 		return (NULL);
 	while (i < info->x)
 	{
@@ -98,7 +98,10 @@ char	**solve(char **board, t_map_info *info)
 
 	result = backtrack(board, info);
 	if (!result)
-		return (board);
+	{
+		free(result);
+		return (low_solve(board, info));
+	}
 	i = result->x;
 	while (i < result->x + result->size)
 	{

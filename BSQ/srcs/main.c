@@ -6,13 +6,11 @@
 /*   By: mmouaffa <mmouaffa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/09 14:15:25 by imeulema          #+#    #+#             */
-/*   Updated: 2024/09/10 13:10:03 by mmouaffa         ###   ########.fr       */
+/*   Updated: 2024/09/11 14:51:17 by imeulema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft.h"
-
-#include <stdio.h>
 
 void	free_board(t_map_info info, char **board)
 {
@@ -31,30 +29,89 @@ void	free_board(t_map_info info, char **board)
 	free(board);
 }
 
-int	main(int ac, char **av)
+void	map_given(char *str)
 {
-	int			i;
 	char		*map;
 	char		**board;
 	t_map_info	info;
 
+	map = get_map(str, 1);
+	if (!map)
+		return ;
+	info = get_first_line_info(map);
+	if (info.x == 0 || info.y == 0)
+		return ;
+	board = get_board(info, map);
+	if (!board)
+		return ;
+	board = solve(board, &info);
+	print_board(board, info);
+	write(1, "\n", 1);
+	free(map);
+	if (board)
+		free_board(info, board);
+	return ;
+}
+
+void	no_map_given(void)
+{
+	char		*map;
+	char		*str;
+	char		**board;
+	t_map_info	info;
+
+	str = 0;
+	map = get_map(str, 0);
+	if (!map)
+		return ;
+	info = get_first_line_info(map);
+	if (info.x == 0 || info.y == 0)
+		return ;
+	board = get_board(info, map);
+	if (!board)
+		return ;
+	board = solve(board, &info);
+	print_board(board, info);
+	write(1, "\n", 1);
+	free(map);
+	if (board)
+		free_board(info, board);
+	return ;
+}
+
+char	**low_solve(char **board, t_map_info *info)
+{
+	int	i;
+	int	j;
+
+	if (low_density(board, info) == 1)
+	{
+		i = 0;
+		while (i < info->x)
+		{
+			j = 0;
+			while (j < info->y)
+			{
+				board[i][j] = info->fill;
+				j++;
+			}
+			i++;
+		}
+	}
+	return (board);
+}
+
+int	main(int ac, char **av)
+{
+	int	i;
+
 	i = 1;
 	while (i < ac)
 	{
-		map = get_map(av[i]);
-		if (!map)
-			return (1);
-		info = get_first_line_info(map);
-		board = get_board(info, map);
-		if (!board)
-			return (1);
+		map_given(av[i]);
 		i++;
-		printf("Empty = %c\nObstacle = %c\nFill = %c\nRows = %d\nCols = %d\n",
-			info.empty, info.obstacle, info.fill, info.x, info.y);
-		board = solve(board, &info);
-		print_board(board, info);
-		free(map);
-		if (board)
-			free_board(info, board);
 	}
+	if (ac == 1)
+		no_map_given();
+	return (0);
 }
