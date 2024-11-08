@@ -6,7 +6,7 @@
 /*   By: imeulema <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/09 15:32:53 by imeulema          #+#    #+#             */
-/*   Updated: 2024/09/11 14:57:39 by imeulema         ###   ########.fr       */
+/*   Updated: 2024/09/11 17:28:07 by imeulema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ int	ft_atoi(char *str)
 			nb = nb * 10 + str[i] - 48;
 		else
 		{
-			write(1, "map1error\n", 10);
+			write(1, "map error\n", 10);
 			return (0);
 		}
 		i++;
@@ -38,12 +38,15 @@ int	get_cols(char *map, int len)
 	int	count;
 
 	count = 0;
-	while (map[len] != '\n')
-		len++;
-	len++;
-	if (map[len] == '\0')
+	if (len >= 4)
 	{
-		write(1, "map2error\n", 10);
+		while (map[len] != '\n')
+			len++;
+		len++;
+	}
+	if (len < 4 || map[len] == '\0')
+	{
+		write(1, "map error\n", 10);
 		return (0);
 	}
 	while (map[len] != '\n')
@@ -59,7 +62,7 @@ int	verify_infos(t_map_info info)
 	if (info.empty == info.obstacle || info.empty == info.fill
 		|| info.obstacle == info.fill)
 	{
-		write(1, "map3error\n", 10);
+		write(1, "map error\n", 10);
 		return (0);
 	}
 	else

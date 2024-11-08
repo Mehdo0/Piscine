@@ -1,5 +1,5 @@
 NAME = bsq
-CC = gcc
+CC = cc
 CFLAGS = -Wall -Wextra -Werror
 SRCS = srcs/main.c srcs/utilities.c srcs/solve.c srcs/get_map.c srcs/get_map_info.c srcs/get_board.c
 OBJS = $(SRCS:.c=.o)
